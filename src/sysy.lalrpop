@@ -1,31 +1,52 @@
 grammar;
 
-match {
-    r"\s*" => { }, // The default whitespace skipping is disabled if an `ignore pattern` is specified
-    r"//[^\n\r]*[\n\r]*" => { }, // Skip `// comments`
-    r"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/" => { },  // Skip `/* comments */`
-}
+use super::ast::*;
 
-pub CompUnit: String = <func_def: FuncDef> => func_def;
+extern {
+    type Location = usize;
+    type Error = String;
 
-FuncDef: String = {
-    <func_type: FuncType> <id: Ident> "(" ")" <block: Block> => {
-        format!("{} {}() {}", func_type, id, block)
+    enum Token {
+        "const" => Token::Const,
+        "int" => Token::Int,
+        "void" => Token::Void,
+        "if" => Token::If,
+        "else" => Token::Else,
+        "while" => Token::While,
+        "break" => Token::Break,
+        "continue" => Token::Continue,
+        "return" => Token::Return,
+        "(" => Token::LParen,
+        ")" => Token::RParen,
+        "{" => Token::LBrace,
+        "}" => Token::RBrace,
+        "[" => Token::LBracket,
+        "]" => Token::RBracket,
+        ";" => Token::Semi,
+        "," => Token::Comma,
+        "=" => Token::Assign,
+        "+" => Token::Plus,
+        "-" => Token::Minus,
+        "!" => Token::Not,
+        "*" => Token::Mul,
+        "/" => Token::Div,
+        "%" => Token::Mod,
+        "<" => Token::Lt,
+        ">" => Token::Gt,
+        "<=" => Token::Le,
+        ">=" => Token::Ge,
+        "==" => Token::Eq,
+        "!=" => Token::Neq,
+        "&&" => Token::And,
+        "||" => Token::Or,
+        "IDENT" => Token::Ident(String),
+        "INT_CONST" => Token::IntConst(i32),
     }
 }
 
-FuncType: String = "int" => "int".to_string();
+pub CompUnit: CompUnit = {
+    <decl: Decl> => CompUnit::Decl(Box::new(decl)),
+    <func_def: FuncDef> => CompUnit::FuncDef(Box::new(func_def)),
+};
 
-Block: String = "{" <stmt: Stmt> "}" => format!("{{ {} }}", stmt);
-
-Stmt: String = "return" <num: Number> ";" => format!("return {};", num);
-
-Number: String = <num: IntConst> => num.to_string();
-
-Ident: String = r"[_a-zA-Z][_a-zA-Z0-9]*" => <>.to_string();
-
-IntConst: i32 = {
-    r"[1-9][0-9]*" => i32::from_str_radix(<>, 10).unwrap(),
-    r"0[0-7]*" => i32::from_str_radix(<>, 8).unwrap(),
-    r"0[xX][0-9a-fA-F]+" => i32::from_str_radix(&<>[2..], 16).unwrap(),
-}
+// 其他规则...
