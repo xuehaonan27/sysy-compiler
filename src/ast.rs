@@ -131,8 +131,14 @@ pub enum LAndExp {
 #[derive(Debug)]
 pub enum EqExp {
     RelExp(Box<RelExp>),
-    Eq(Box<EqExp>, RelOp, Box<RelExp>),
-    Neq(Box<EqExp>, RelOp, Box<RelExp>),
+    Eq(Box<EqExp>, Box<RelExp>),
+    Neq(Box<EqExp>, Box<RelExp>),
+}
+
+#[derive(Debug)]
+pub enum EqOp {
+    Eq,
+    Neq,
 }
 
 #[derive(Debug)]
@@ -160,6 +166,19 @@ pub enum MulExp {
 }
 
 #[derive(Debug)]
+pub enum BinaryOp {
+    Add,
+    Sub,
+}
+
+#[derive(Debug)]
+pub enum FactorOp {
+    Mul,
+    Div,
+    Mod,
+}
+
+#[derive(Debug)]
 pub enum UnaryExp {
     PrimaryExp(Box<PrimaryExp>),
     Call(IDENT, Vec<Exp>),
@@ -175,8 +194,8 @@ pub enum PrimaryExp {
 
 #[derive(Debug)]
 pub enum UnaryOp {
-    Plus,
-    Minus,
+    Add,
+    Sub,
     Not,
 }
 

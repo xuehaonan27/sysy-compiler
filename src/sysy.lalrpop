@@ -74,3 +74,116 @@ CommaList<T>: Vec<T> = {
         }
     }
 };
+
+
+
+
+// pub Stmt: Stmt = {
+    // AssignStatement =>
+    // ExpStatement =>
+    // BlockStatement =>
+
+    // IfThenStatement => 
+    // IfThenElseStatement =>
+    // WhileStatement =>
+    // BreakStatement =>
+    // ContinueStatement =>
+    // ReturnStatement =>
+// };
+
+// AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, exp);
+
+pub UnaryExp: UnaryExp = {
+    <op: UnaryOp> <exp: UnaryExp> => UnaryExp::UnaryOp(op, Box::new(exp)),
+};
+
+pub UnaryOp: UnaryOp = {
+    "+" => UnaryOp::Add,
+    "-" => UnaryOp::Sub,
+    "!" => UnaryOp::Not,
+};
+
+// MulExp ::= UnaryExp | MulExp ("*" | "/" | "%") UnaryExp;
+pub MulExp: MulExp = {
+    <unary_exp: UnaryExp> => MulExp::UnaryExp(Box::new(unary_exp)),
+    <mul_exp: MulExp> <factor_op: FactorOp> <unary_exp: UnaryExp> => {
+        match factor_op {
+            FactorOp::Mul => MulExp::Mul(Box::new(mul_exp), Box::new(unary_exp)),
+            FactorOp::Div => MulExp::Div(Box::new(mul_exp), Box::new(unary_exp)),
+            FactorOp::Mod => MulExp::Mod(Box::new(mul_exp), Box::new(unary_exp)),
+        }
+    },
+};
+
+// AddExp ::= MulExp | AddExp ("+" | "-") MulExp;
+pub AddExp: AddExp = {
+    <MulExp> => AddExp::MulExp(Box::new(<>)),
+    <add_exp: AddExp> <binary_op: BinaryOp> <mul_exp: MulExp> => {
+        match binary_op {
+            BinaryOp::Add => AddExp::Add(Box::new(add_exp), Box::new(mul_exp)),
+            BinaryOp::Sub => AddExp::Sub(Box::new(add_exp), Box::new(mul_exp)),
+        }
+    },
+};
+
+pub BinaryOp: BinaryOp = {
+    "+" => BinaryOp::Add,
+    "-" => BinaryOp::Sub,
+};
+
+pub FactorOp: FactorOp = {
+    "*" => FactorOp::Mul,
+    "/" => FactorOp::Div,
+    "%" => FactorOp::Mod,
+};
+
+// RelExp ::= AddExp | RelExp ("<" | ">" | "<=" | ">=") AddExp;
+pub RelExp: RelExp = {
+    <add_exp: AddExp> => RelExp::AddExp(Box::new(add_exp)),
+    <rel_exp: RelExp> <rel_op: RelOp> <add_exp: AddExp> => {
+        match rel_op {
+            RelOp::Lt => RelExp::Lt(Box::new(rel_exp), Box::new(add_exp)),
+            RelOp::Gt => RelExp::Gt(Box::new(rel_exp), Box::new(add_exp)),
+            RelOp::Le => RelExp::Le(Box::new(rel_exp), Box::new(add_exp)),
+            RelOp::Ge => RelExp::Ge(Box::new(rel_exp), Box::new(add_exp)),
+        }
+    },
+};
+
+pub RelOp: RelOp = {
+    "<" => RelOp::Lt,
+    ">" => RelOp::Gt,
+    "<=" => RelOp::Le,
+    ">=" => RelOp::Ge,
+};
+
+// EqExp ::= RelExp | EqExp ("==" | "!=") RelExp;
+pub EqExp: EqExp = {
+    <RelExp> => EqExp::RelExp(Box::new(<>)),
+    <eq_exp: EqExp> <eq_op: EqOp> <rel_exp: RelExp> => {
+        match eq_op {
+            EqOp::Eq => EqExp::Eq(Box::new(eq_exp), Box::new(rel_exp)),
+            EqOp::Neq => EqExp::Neq(Box::new(eq_exp), Box::new(rel_exp)),
+        }
+    },
+};
+
+pub EqOp: EqOp = {
+    "==" => EqOp::Eq,
+    "!=" => EqOp::Neq,
+};
+
+// LAndExp ::= EqExp | LAndExp "&&" EqExp;
+pub LAndExp: LAndExp = {
+    <EqExp> => LAndExp::EqExp(Box::new(<>)),
+    <land_exp: LAndExp> "&&" <eq_exp: EqExp> => LAndExp::And(Box::new(land_exp), Box::new(eq_exp)),
+};
+
+// LOrExp ::= LAndExp | LOrExp "||" LAndExp;
+pub LOrExp: LOrExp = {
+    <LAndExp> => LOrExp::LAndExp(Box::new(<>)),
+    <lor_exp: LOrExp> "||" <land_exp: LAndExp> => LOrExp::Or(Box::new(lor_exp), Box::new(land_exp)),
+};
+
+// ConstExp ::= Exp;
+// pub ConstExp: ConstExp = <Exp> => ConstExp::Exp(Box::new(<>));
