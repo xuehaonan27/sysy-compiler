@@ -75,6 +75,64 @@ CommaList<T>: Vec<T> = {
     }
 };
 
+BracketList<T>: Vec<T> = {
+    => vec![],
+    <mut indices: BracketList<T>> "[" <t: T> "]" => {
+        indices.push(t);
+        indices
+    },
+};
+
+// CompUnit ::= [CompUnit] (Decl | FuncDef);
+pub CompUnit: CompUnit = {
+    <prev_unit: CompUnit?> <cur_unit: DeclOrFuncDef> => {
+        let prev_unit = prev_unit.and_then(|prev_unit| Some(Box::new(prev_unit)));
+        CompUnit {
+            prev_unit,
+            cur_unit,
+        }
+    },
+};
+
+DeclOrFuncDef: DeclOrFuncDef = {
+    Decl => DeclOrFuncDef::Decl(Box::new(<>)),
+   // FuncDef => DeclOrFuncDef::FuncDef(Box::new(<>)),
+};
+
+// Decl ::= ConstDecl | VarDecl;
+pub Decl: Decl = {
+    ConstDecl => Decl::ConstDecl(Box::new(<>)),
+   //  VarDecl => Decl::VarDecl(Box::new(<>)),
+};
+
+// ConstDecl ::= "const" BType ConstDef {"," ConstDef} ";";
+pub ConstDecl: ConstDecl = {
+    "const" <btype: BType> <const_defs: CommaList<ConstDef>> ";" => ConstDecl {
+        btype,
+        const_defs,
+    },
+};
+
+// BType ::= "int";
+pub BType: BType = {
+    "int" => BType::Int,
+};
+
+// ConstDef ::= IDENT {"[" ConstExp "]"} "=" ConstInitVal;
+pub ConstDef: ConstDef = {
+    <ident: IDENT> <dimensions: BracketList<ConstExp>> "=" <init_val: ConstInitVal> => ConstDef {
+        ident,
+        dimensions,
+        init_val,
+    },
+};
+
+// ConstInitVal ::= ConstExp | "{" [ConstInitVal {"," ConstInitVal}] "}";
+pub ConstInitVal: ConstInitVal = {
+    <exp: ConstExp> => ConstInitVal::Exp(Box::new(exp)),
+    "{" <vals: BracketList<ConstInitVal>> "}" => ConstInitVal::Array(vals),
+};
+
 pub Stmt: Stmt = {
     AssignStatement => <>,
     ExpStatement => <>,
@@ -123,17 +181,9 @@ pub Exp: Exp = {
 
 // LVal ::= IDENT {"[" Exp "]"};
 pub LVal: LVal = {
-    <ident: IDENT> <indices: IndexList> => LVal {
+    <ident: IDENT> <indices: BracketList<Exp>> => LVal {
         ident,
         indices,
-    },
-};
-
-IndexList: Vec<Exp> = {
-    => vec![],
-    <mut indices: IndexList> "[" <exp: Exp> "]" => {
-        indices.push(exp);
-        indices
     },
 };
 
