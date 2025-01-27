@@ -83,6 +83,9 @@ pub struct FuncFParam {
 }
 
 #[derive(Debug)]
+pub struct FuncRParams(pub Vec<Exp>);
+
+#[derive(Debug)]
 pub struct Block {
     pub items: Vec<BlockItem>,
 }

@@ -134,6 +134,9 @@ pub UnaryOp: UnaryOp = {
     "!" => UnaryOp::Not,
 };
 
+// FuncRParams ::= Exp {"," Exp};
+pub FuncRParams: FuncRParams = CommaList<Exp> => FuncRParams(<>);
+
 // MulExp ::= UnaryExp | MulExp ("*" | "/" | "%") UnaryExp;
 pub MulExp: MulExp = {
     <unary_exp: UnaryExp> => MulExp::UnaryExp(Box::new(unary_exp)),
