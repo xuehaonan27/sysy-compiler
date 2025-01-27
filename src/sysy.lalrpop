@@ -81,8 +81,8 @@ pub Stmt: Stmt = {
     // BlockStatement => <>,
 
     IfThenStatement => <>,
-    IfThenElseStatement => <>.
-    // WhileStatement =>
+    IfThenElseStatement => <>,
+    WhileStatement => <>,
     BreakStatement => <>,
     ContinueStatement => <>,
     ReturnStatement => <>,
@@ -106,11 +106,15 @@ IfThenElseStatement: Stmt = "if" "(" <cond: Exp> ")" <then: StatementNoShortIf> 
 
 StatementNoShortIf: Stmt = {
     IfThenElseStatementNoShortIf => <>,
-    // WhileStatementNoShortIf => <>,
+    WhileStatementNoShortIf => <>,
     // ForStatementNoShortIf => <>,
 };
 
 IfThenElseStatementNoShortIf: Stmt = "if" "(" <cond: Exp> ")" <then: StatementNoShortIf> "else" <else_: StatementNoShortIf> => Stmt::If(cond, Box::new(then), Some(Box::new(else_)));
+
+WhileStatement: Stmt = "while" "(" <cond: Exp> ")" <body: Stmt> => Stmt::While(cond, Box::new(body));
+
+WhileStatementNoShortIf: Stmt = "while" "(" <cond: Exp> ")" <body: StatementNoShortIf> => Stmt::While(cond, Box::new(body));
 
 // Exp ::= LOrExp;
 pub Exp: Exp = {
