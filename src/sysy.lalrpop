@@ -75,9 +75,6 @@ CommaList<T>: Vec<T> = {
     }
 };
 
-
-
-
 // pub Stmt: Stmt = {
     // AssignStatement =>
     // ExpStatement =>
@@ -93,10 +90,28 @@ CommaList<T>: Vec<T> = {
 
 // AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, exp);
 
+// Exp ::= LOrExp;
 pub Exp: Exp = {
     <LOrExp> => Exp::LOrExp(Box::new(<>)),
 };
 
+// LVal ::= IDENT {"[" Exp "]"};
+pub LVal: LVal = {
+    <ident: IDENT> <indices: IndexList> => LVal {
+        ident,
+        indices,
+    },
+};
+
+IndexList: Vec<Exp> = {
+    => vec![],
+    <mut indices: IndexList> "[" <exp: Exp> "]" => {
+        indices.push(exp);
+        indices
+    },
+};
+
+// UnaryExp ::= PrimaryExp | IDENT "(" [FuncRParams] ")" | UnaryOp UnaryExp;
 pub UnaryExp: UnaryExp = {
     <op: UnaryOp> <exp: UnaryExp> => UnaryExp::UnaryOp(op, Box::new(exp)),
 };
