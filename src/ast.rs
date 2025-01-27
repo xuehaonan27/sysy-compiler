@@ -62,16 +62,10 @@ pub enum InitVal {
 
 #[derive(Debug)]
 pub struct FuncDef {
-    pub func_type: FuncType,
+    pub func_type: BType,
     pub ident: IDENT,
     pub params: Vec<FuncFParam>,
     pub block: Block,
-}
-
-#[derive(Debug)]
-pub enum FuncType {
-    Void,
-    Int,
 }
 
 #[derive(Debug)]
