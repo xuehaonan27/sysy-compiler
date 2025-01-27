@@ -80,12 +80,12 @@ pub Stmt: Stmt = {
     ExpStatement => <>,
     // BlockStatement => <>,
 
-    // IfThenStatement => 
-    // IfThenElseStatement =>
+    IfThenStatement => <>,
+    IfThenElseStatement => <>.
     // WhileStatement =>
-    BreakStatement =>
-    ContinueStatement =>
-    ReturnStatement =>
+    BreakStatement => <>,
+    ContinueStatement => <>,
+    ReturnStatement => <>,
 };
 
 AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, exp);
@@ -99,6 +99,18 @@ BreakStatement: Stmt = "break" ";" => Stmt::Break;
 ContinueStatement: Stmt = "continue" ";" => Stmt::Continue;
     
 ReturnStatement: Stmt = "return" <exp: Exp?> ";" => Stmt::Return(exp);
+
+IfThenStatement: Stmt = "if" "(" <cond: Exp> ")" <then: Stmt> => Stmt::If(cond, Box::new(then), None);
+
+IfThenElseStatement: Stmt = "if" "(" <cond: Exp> ")" <then: StatementNoShortIf> "else" <else_: Stmt> => Stmt::If(cond, Box::new(then), Some(Box::new(else_)));
+
+StatementNoShortIf: Stmt = {
+    IfThenElseStatementNoShortIf => <>,
+    // WhileStatementNoShortIf => <>,
+    // ForStatementNoShortIf => <>,
+};
+
+IfThenElseStatementNoShortIf: Stmt = "if" "(" <cond: Exp> ")" <then: StatementNoShortIf> "else" <else_: StatementNoShortIf> => Stmt::If(cond, Box::new(then), Some(Box::new(else_)));
 
 // Exp ::= LOrExp;
 pub Exp: Exp = {
