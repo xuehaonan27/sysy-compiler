@@ -1,52 +1,76 @@
 grammar;
 
-use super::ast::*;
+use crate::ast::*;
+use crate::token::{Token, LexicalError};
 
 extern {
     type Location = usize;
     type Error = String;
 
     enum Token {
+        IDENT => Token::Ident,
+        INT_CONST => Token::IntConst,
+
         "const" => Token::Const,
-        "int" => Token::Int,
-        "void" => Token::Void,
         "if" => Token::If,
         "else" => Token::Else,
         "while" => Token::While,
         "break" => Token::Break,
         "continue" => Token::Continue,
         "return" => Token::Return,
-        "(" => Token::LParen,
-        ")" => Token::RParen,
-        "{" => Token::LBrace,
-        "}" => Token::RBrace,
-        "[" => Token::LBracket,
-        "]" => Token::RBracket,
-        ";" => Token::Semi,
-        "," => Token::Comma,
-        "=" => Token::Assign,
+
         "+" => Token::Plus,
         "-" => Token::Minus,
         "!" => Token::Not,
         "*" => Token::Mul,
         "/" => Token::Div,
         "%" => Token::Mod,
+        "^" => Token::Pow,
+
+        "&" => Token::BitAnd,
+        "~" => Token::BitNot,
+        "|" => Token::BitOr,
+        "<<" => Token::ShiftL,
+        ">>" => Token::ShiftR,
+        
+        "&&" => Token::And,
+        "||" => Token::Or,
+
         "<" => Token::Lt,
         ">" => Token::Gt,
         "<=" => Token::Le,
         ">=" => Token::Ge,
         "==" => Token::Eq,
         "!=" => Token::Neq,
-        "&&" => Token::And,
-        "||" => Token::Or,
-        "IDENT" => Token::Ident(String),
-        "INT_CONST" => Token::IntConst(i32),
+
+        "=" => Token::Assign,
+        
+        "(" => Token::LParen,
+        ")" => Token::RParen,
+        "{" => Token::LBrace,
+        "}" => Token::RBrace,
+        "[" => Token::LBracket,
+        "]" => Token::RBracket,
+        
+        "," => Token::Comma,
+        ";" => Token::SemiColon,
+        ":" => Token::Colon,
+        "::" => Token::DoubleColon,
+        "." => Token::Dot,
+        ".." => Token::Concat,
+        "..." => Token::Dots,
+
+        "int" => Token::Int,
+        "void" => Token::Void,   
     }
 }
 
-pub CompUnit: CompUnit = {
-    <decl: Decl> => CompUnit::Decl(Box::new(decl)),
-    <func_def: FuncDef> => CompUnit::FuncDef(Box::new(func_def)),
+CommaList<T>: Vec<T> = {
+    <mut v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            v.push(e);
+            v
+        }
+    }
 };
-
-// 其他规则...

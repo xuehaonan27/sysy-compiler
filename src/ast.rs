@@ -1,7 +1,13 @@
 pub type IDENT = String;
 
 #[derive(Debug)]
-pub enum CompUnit {
+pub struct CompUnit {
+    pub prev_unit: Option<Box<CompUnit>>,
+    pub cur_unit: DeclOrFuncDef,
+}
+
+#[derive(Debug)]
+pub enum DeclOrFuncDef {
     Decl(Box<Decl>),
     FuncDef(Box<FuncDef>),
 }

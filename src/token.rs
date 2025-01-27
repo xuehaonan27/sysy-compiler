@@ -18,24 +18,26 @@ impl From<ParseIntError> for LexicalError {
 pub enum Token {
     #[regex(r"[ \t\n\r]+", logos::skip)]
     Whitespace,
-
+    #[regex(r"//[^\n\r]*[\n\r]*", logos::skip)]
+    SingleLineComment,
+    #[regex(r"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/", logos::skip)]
+    MultipleLinesComment,
     #[regex(r"[_a-zA-Z][_a-zA-Z0-9]*", |lex| lex.slice().to_string())]
     Ident(String),
 
-    #[regex(r"[1-9][0-9]*", |lex| lex.slice().parse().ok())]
-    DecimalConst(u64),
-
+    #[regex(r"[1-9][0-9]*", |lex| {
+        let slice = lex.slice();
+        i32::from_str_radix(slice, 10).ok()
+    })]
     #[regex(r"0[0-7]*", |lex| {
         let slice = lex.slice();
-        u64::from_str_radix(slice, 8).ok()
+        i32::from_str_radix(slice, 8).ok()
     })]
-    OctalConst(u64),
-
     #[regex(r"0[xX][0-9a-fA-F]+", |lex| {
         let slice = &lex.slice()[2..]; // strip "0x" or "0X"
-        u64::from_str_radix(slice, 16).ok()
+        i32::from_str_radix(slice, 16).ok()
     })]
-    HexadecimalConst(u64),
+    IntConst(i32),
 
     #[token("const")]
     Const, // const
@@ -77,37 +79,38 @@ pub enum Token {
     ShiftR, // >>
 
     #[token("&&")]
-    LogicAnd, // &&
+    And, // &&
     #[token("||")]
-    LogicOr, // ||
+    Or, // ||
 
     #[token("==")]
-    Equal, // ==
+    Eq, // ==
     #[token("!=")]
-    NotEq, // !=
+    Neq, // !=
     #[token("<=")]
-    LesEq, // <=
+    Le, // <=
     #[token(">=")]
-    GreEq, // >=
+    Ge, // >=
     #[token("<")]
-    Less, // <
+    Lt, // <
     #[token(">")]
-    Greater, // >
+    Gt, // >
     #[token("=")]
     Assign, // =
 
     #[token("(")]
-    ParL, // (
+    LParen, // (
     #[token(")")]
-    ParR, // )
+    RParen, // )
     #[token("{")]
-    CurlyL, // {
+    LBrace, // {
     #[token("}")]
-    CurlyR, // }
+    RBrace, // }
     #[token("[")]
-    SqurL, // [
+    LBracket, // [
     #[token("]")]
-    SqurR, // ]
+    RBracket, // ]
+
     #[token(",")]
     Comma, // ,
     #[token(";")]
@@ -115,7 +118,7 @@ pub enum Token {
     #[token(":")]
     Colon, // :
     #[token("::")]
-    DoubColon, // ::
+    DoubleColon, // ::
     #[token(".")]
     Dot, // .
     #[token("..")]
