@@ -195,8 +195,7 @@ pub BlockItem: BlockItem = {
 pub Stmt: Stmt = {
     AssignStatement => <>,
     ExpStatement => <>,
-    // BlockStatement => <>,
-
+    BlockStatement => <>,
     IfThenStatement => <>,
     IfThenElseStatement => <>,
     WhileStatement => <>,
@@ -209,7 +208,7 @@ AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, ex
 
 ExpStatement: Stmt = <exp: Exp?> ";" => Stmt::Exp(exp);
 
-// BlockStatement: Stmt = <block: Block> => Stmt::Block(block);
+BlockStatement: Stmt = <block: Block> => Stmt::Block(block);
 
 BreakStatement: Stmt = "break" ";" => Stmt::Break;
 
