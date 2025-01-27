@@ -96,13 +96,13 @@ pub CompUnit: CompUnit = {
 
 DeclOrFuncDef: DeclOrFuncDef = {
     Decl => DeclOrFuncDef::Decl(Box::new(<>)),
-   // FuncDef => DeclOrFuncDef::FuncDef(Box::new(<>)),
+    //FuncDef => DeclOrFuncDef::FuncDef(Box::new(<>)),
 };
 
 // Decl ::= ConstDecl | VarDecl;
 pub Decl: Decl = {
     ConstDecl => Decl::ConstDecl(Box::new(<>)),
-   //  VarDecl => Decl::VarDecl(Box::new(<>)),
+    VarDecl => Decl::VarDecl(Box::new(<>)),
 };
 
 // ConstDecl ::= "const" BType ConstDef {"," ConstDef} ";";
@@ -131,6 +131,26 @@ pub ConstDef: ConstDef = {
 pub ConstInitVal: ConstInitVal = {
     <exp: ConstExp> => ConstInitVal::Exp(Box::new(exp)),
     "{" <vals: BracketList<ConstInitVal>> "}" => ConstInitVal::Array(vals),
+};
+
+// VarDecl ::= BType VarDef {"," VarDef} ";";
+pub VarDecl: VarDecl = {
+    <btype: BType> <var_defs: CommaList<VarDef>> ";" => VarDecl {
+        btype,
+        var_defs,
+    },
+};
+
+// VarDef ::= IDENT {"[" ConstExp "]"} | IDENT {"[" ConstExp "]"} "=" InitVal;
+pub VarDef: VarDef = {
+    <ident: IDENT> <dimensions: BracketList<ConstExp>> => VarDef::Uninit(ident, dimensions),
+    <ident: IDENT> <dimensions: BracketList<ConstExp>> "=" <init_val: InitVal> => VarDef::Init(ident, dimensions, init_val),
+};
+
+// InitVal ::= Exp | "{" [InitVal {"," InitVal}] "}";
+pub InitVal: InitVal = {
+    <exp: Exp> => InitVal::Exp(Box::new(exp)),
+    "{" <vals: BracketList<InitVal>> "}" => InitVal::Array(vals),
 };
 
 pub Stmt: Stmt = {
