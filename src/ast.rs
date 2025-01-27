@@ -27,6 +27,7 @@ pub struct ConstDecl {
 #[derive(Debug)]
 pub enum BType {
     Int,
+    Void,
 }
 
 #[derive(Debug)]

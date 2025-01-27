@@ -6,8 +6,7 @@ use std::io::Result;
 
 mod token;
 mod ast;
-
-// lalrpop_mod!(sysy);
+mod sysy; // generate_in_source_tree
 
 fn main() {
     let mut koopa_src_file_path = String::new();

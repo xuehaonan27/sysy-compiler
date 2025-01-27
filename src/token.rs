@@ -15,6 +15,7 @@ impl From<ParseIntError> for LexicalError {
 }
 
 #[derive(Logos, Debug, Clone, PartialEq)]
+#[logos(extras = i32)]
 pub enum Token {
     #[regex(r"[ \t\n\r]+", logos::skip)]
     Whitespace,
@@ -66,6 +67,8 @@ pub enum Token {
     Mod, // %
     #[token("^")]
     Pow, // ^
+    #[token("!")]
+    Not,
 
     #[token("&")]
     BitAnd, // &

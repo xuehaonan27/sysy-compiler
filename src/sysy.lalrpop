@@ -8,8 +8,8 @@ extern {
     type Error = String;
 
     enum Token {
-        IDENT => Token::Ident,
-        INT_CONST => Token::IntConst,
+        IDENT => Token::Ident(<String>),
+        INT_CONST => Token::IntConst(<i32>),
 
         "const" => Token::Const,
         "if" => Token::If,
@@ -19,8 +19,8 @@ extern {
         "continue" => Token::Continue,
         "return" => Token::Return,
 
-        "+" => Token::Plus,
-        "-" => Token::Minus,
+        "+" => Token::Add,
+        "-" => Token::Sub,
         "!" => Token::Not,
         "*" => Token::Mul,
         "/" => Token::Div,
