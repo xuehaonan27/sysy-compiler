@@ -75,20 +75,30 @@ CommaList<T>: Vec<T> = {
     }
 };
 
-// pub Stmt: Stmt = {
-    // AssignStatement =>
-    // ExpStatement =>
-    // BlockStatement =>
+pub Stmt: Stmt = {
+    AssignStatement => <>,
+    ExpStatement => <>,
+    // BlockStatement => <>,
 
     // IfThenStatement => 
     // IfThenElseStatement =>
     // WhileStatement =>
-    // BreakStatement =>
-    // ContinueStatement =>
-    // ReturnStatement =>
-// };
+    BreakStatement =>
+    ContinueStatement =>
+    ReturnStatement =>
+};
 
-// AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, exp);
+AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, exp);
+
+ExpStatement: Stmt = <exp: Exp?> ";" => Stmt::Exp(exp);
+
+// BlockStatement: Stmt = <block: Block> => Stmt::Block(block);
+
+BreakStatement: Stmt = "break" ";" => Stmt::Break;
+
+ContinueStatement: Stmt = "continue" ";" => Stmt::Continue;
+    
+ReturnStatement: Stmt = "return" <exp: Exp?> ";" => Stmt::Return(exp);
 
 // Exp ::= LOrExp;
 pub Exp: Exp = {
