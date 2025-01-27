@@ -93,6 +93,10 @@ CommaList<T>: Vec<T> = {
 
 // AssignStatement: Stmt = <lval: LVal> "=" <exp: Exp> ";" => Stmt::Assign(lval, exp);
 
+pub Exp: Exp = {
+    <LOrExp> => Exp::LOrExp(Box::new(<>)),
+};
+
 pub UnaryExp: UnaryExp = {
     <op: UnaryOp> <exp: UnaryExp> => UnaryExp::UnaryOp(op, Box::new(exp)),
 };
@@ -186,4 +190,4 @@ pub LOrExp: LOrExp = {
 };
 
 // ConstExp ::= Exp;
-// pub ConstExp: ConstExp = <Exp> => ConstExp::Exp(Box::new(<>));
+pub ConstExp: ConstExp = <Exp> => ConstExp::Exp(Box::new(<>));
