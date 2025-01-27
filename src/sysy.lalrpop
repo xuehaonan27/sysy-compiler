@@ -96,7 +96,7 @@ pub CompUnit: CompUnit = {
 
 DeclOrFuncDef: DeclOrFuncDef = {
     Decl => DeclOrFuncDef::Decl(Box::new(<>)),
-    //FuncDef => DeclOrFuncDef::FuncDef(Box::new(<>)),
+    FuncDef => DeclOrFuncDef::FuncDef(Box::new(<>)),
 };
 
 // Decl ::= ConstDecl | VarDecl;
@@ -116,6 +116,7 @@ pub ConstDecl: ConstDecl = {
 // BType ::= "int";
 pub BType: BType = {
     "int" => BType::Int,
+    "void" => BType::Void,
 };
 
 // ConstDef ::= IDENT {"[" ConstExp "]"} "=" ConstInitVal;
@@ -151,6 +152,44 @@ pub VarDef: VarDef = {
 pub InitVal: InitVal = {
     <exp: Exp> => InitVal::Exp(Box::new(exp)),
     "{" <vals: BracketList<InitVal>> "}" => InitVal::Array(vals),
+};
+
+// FuncDef ::= FuncType IDENT "(" [FuncFParams] ")" Block;
+// FuncFParams ::= FuncFParam {"," FuncFParam};
+pub FuncDef: FuncDef = {
+    <func_type: BType> <ident: IDENT> "(" <params: CommaList<FuncFParam>> ")" <block: Block> => FuncDef {
+        func_type,
+        ident,
+        params,
+        block,
+    },
+};
+
+// FuncFParam ::= BType IDENT ["[" "]" {"[" ConstExp "]"}];
+pub FuncFParam: FuncFParam = {
+    <btype: BType> <ident: IDENT> => FuncFParam {
+        btype,
+        ident,
+        is_array: false,
+        dimensions: vec![],
+    },
+    <btype: BType> <ident: IDENT> "[" "]" <dimensions: BracketList<ConstExp>> => FuncFParam {
+        btype,
+        ident,
+        is_array: true,
+        dimensions,
+    },
+};
+
+// Block ::= "{" {BlockItem} "}";
+pub Block: Block = {
+    "{" <items: BlockItem*> "}" => Block { items },
+};
+
+// BlockItem ::= Decl | Stmt;
+pub BlockItem: BlockItem = {
+    Decl => BlockItem::Decl(Box::new(<>)),
+    Stmt => BlockItem::Stmt(Box::new(<>)),
 };
 
 pub Stmt: Stmt = {
