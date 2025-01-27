@@ -111,6 +111,18 @@ IndexList: Vec<Exp> = {
     },
 };
 
+// PrimaryExp ::= "(" Exp ")" | LVal | Number;
+pub PrimaryExp: PrimaryExp = {
+    "(" <exp: Exp> ")" => PrimaryExp::Paren(Box::new(exp)),
+    <lval: LVal> => PrimaryExp::LVal(lval),
+    <num: Number> => PrimaryExp::Number(num),
+};
+
+// Number ::= INT_CONST;
+pub Number: i32 = {
+    <num: INT_CONST> => num,
+};
+
 // UnaryExp ::= PrimaryExp | IDENT "(" [FuncRParams] ")" | UnaryOp UnaryExp;
 pub UnaryExp: UnaryExp = {
     <op: UnaryOp> <exp: UnaryExp> => UnaryExp::UnaryOp(op, Box::new(exp)),
